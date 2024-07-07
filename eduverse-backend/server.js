@@ -1,31 +1,74 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const authRoutes = require('./routes/auth');
-const courseRoutes = require('./routes/courses');
-const assignmentRoutes = require('./routes/assignments');
-const messageRoutes = require('./routes/messages');
+const http = require('http');
+const socketIo = require('socket.io');
+
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
 
-
-// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('Connected to MongoDB'))
-.catch((err) => console.error('MongoDB connection error:', err));
+// Connect to MongoDB (replace with your actual connection string)
+mongoose.connect('mongodb://localhost/virtual-classroom', { useNewUrlParser: true, useUnifiedTopology: true });
+
+// Define schemas
+const courseSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  progress: Number,
+  instructor: String
+});
+
+const assignmentSchema = new mongoose.Schema({
+  course: String,
+  title: String,
+  dueDate: Date
+});
+
+const messageSchema = new mongoose.Schema({
+  sender: String,
+  content: String,
+  timestamp: Date
+});
+
+// Create models
+const Course = mongoose.model('Course', courseSchema);
+const Assignment = mongoose.model('Assignment', assignmentSchema);
+const Message = mongoose.model('Message', messageSchema);
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/courses', courseRoutes);
-app.use('/api/assignments', assignmentRoutes);
-app.use('/api/messages', messageRoutes);
+app.get('/api/courses', async (req, res) => {
+  const courses = await Course.find();
+  res.json(courses);
+});
+
+app.get('/api/assignments', async (req, res) => {
+  const assignments = await Assignment.find();
+  res.json(assignments);
+});
+
+app.get('/api/messages', async (req, res) => {
+  const messages = await Message.find().sort('-timestamp').limit(50);
+  res.json(messages);
+});
+
+app.post('/api/messages', async (req, res) => {
+  const message = new Message(req.body);
+  await message.save();
+  io.emit('new_message', message);
+  res.status(201).json(message);
+});
+
+// Socket.io
+io.on('connection', (socket) => {
+  console.log('New client connected');
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

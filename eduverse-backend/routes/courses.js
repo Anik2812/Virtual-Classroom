@@ -19,7 +19,7 @@ router.post('/', auth, async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
     try {
-        const courses = await Course.find({ students: req.user._id }).populate('instructor', 'name');
+        const courses = await Course.find();
         res.send(courses);
     } catch (error) {
         res.status(500).send(error);

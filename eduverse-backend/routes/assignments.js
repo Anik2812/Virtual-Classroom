@@ -16,7 +16,7 @@ router.post('/', auth, async (req, res) => {
 
 router.get('/', auth, async (req, res) => {
     try {
-        const assignments = await Assignment.find().populate('course', 'name');
+        const assignments = await Assignment.find();
         res.send(assignments);
     } catch (error) {
         res.status(500).send(error);
