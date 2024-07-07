@@ -1,31 +1,31 @@
 // Mock data (replace with actual API calls in a real application)
 const mockData = {
     courses: [
-        { id: 1, name: "Mathematics", description: "Advanced calculus and algebra", progress: 60 },
-        { id: 2, name: "Physics", description: "Classical mechanics and thermodynamics", progress: 40 },
-        { id: 3, name: "Computer Science", description: "Data structures and algorithms", progress: 75 },
+        { id: 1, name: "Advanced Mathematics", description: "Complex calculus and linear algebra", progress: 60, instructor: "Dr. Harsh Patel" },
+        { id: 2, name: "Quantum Physics", description: "Principles of quantum mechanics", progress: 40, instructor: "Prof. Jaimin Shah" },
+        { id: 3, name: "Data Structures", description: "Advanced algorithms and data structures", progress: 75, instructor: "Dr. Swayam Desai" },
     ],
     upcomingClasses: [
-        { course: "Mathematics", date: "2024-07-10", time: "10:00 AM" },
-        { course: "Physics", date: "2024-07-11", time: "2:00 PM" },
-        { course: "Computer Science", date: "2024-07-12", time: "11:00 AM" },
+        { course: "Advanced Mathematics", date: "2024-07-10", time: "10:00 AM" },
+        { course: "Quantum Physics", date: "2024-07-11", time: "2:00 PM" },
+        { course: "Data Structures", date: "2024-07-12", time: "11:00 AM" },
     ],
     announcements: [
-        { title: "New course material available", date: "2024-07-08" },
-        { title: "Upcoming exam schedule", date: "2024-07-09" },
+        { title: "New course material available for Advanced Mathematics", date: "2024-07-08" },
+        { title: "Quantum Physics exam rescheduled", date: "2024-07-09" },
     ],
     todoItems: [
-        { task: "Complete Math assignment", dueDate: "2024-07-15" },
-        { task: "Read Chapter 5 of Physics textbook", dueDate: "2024-07-14" },
+        { task: "Complete Math assignment on Complex Integration", dueDate: "2024-07-15" },
+        { task: "Prepare presentation for Quantum Entanglement", dueDate: "2024-07-14" },
     ],
     assignments: [
-        { id: 1, course: "Mathematics", title: "Problem Set 3", dueDate: "2024-07-20" },
-        { id: 2, course: "Physics", title: "Lab Report 2", dueDate: "2024-07-22" },
-        { id: 3, course: "Computer Science", title: "Programming Project 1", dueDate: "2024-07-25" },
+        { id: 1, course: "Advanced Mathematics", title: "Complex Integration Problems", dueDate: "2024-07-20" },
+        { id: 2, course: "Quantum Physics", title: "Quantum Entanglement Essay", dueDate: "2024-07-22" },
+        { id: 3, course: "Data Structures", title: "Implement Red-Black Tree", dueDate: "2024-07-25" },
     ],
     messages: [
-        { sender: "Prof. Smith", content: "Don't forget about the upcoming quiz!", timestamp: "2024-07-08 09:30 AM" },
-        { sender: "John Doe", content: "Can we discuss the latest assignment?", timestamp: "2024-07-08 02:15 PM" },
+        { sender: "Dr. Harsh Patel", content: "Don't forget about the upcoming calculus quiz!", timestamp: "2024-07-08 09:30 AM" },
+        { sender: "Jaimin", content: "Can we discuss the quantum mechanics project?", timestamp: "2024-07-08 02:15 PM" },
     ],
 };
 
@@ -44,6 +44,7 @@ const modal = document.getElementById('modal');
 const modalTitle = document.getElementById('modal-title');
 const modalBody = document.getElementById('modal-body');
 const closeModal = document.getElementsByClassName('close')[0];
+const notification = document.getElementById('notification');
 
 // Initialize the application
 function init() {
@@ -114,6 +115,7 @@ function populateCourseGrid() {
         courseCard.innerHTML = `
             <h3>${course.name}</h3>
             <p>${course.description}</p>
+            <p>Instructor: ${course.instructor}</p>
             <progress value="${course.progress}" max="100"></progress>
             <p>${course.progress}% Complete</p>
             <button class="btn" onclick="showCourseDetails(${JSON.stringify(course)})">View Details</button>
@@ -174,6 +176,7 @@ function showCourseDetails(course) {
     modalTitle.textContent = course.name;
     modalBody.innerHTML = `
         <p>${course.description}</p>
+        <p>Instructor: ${course.instructor}</p>
         <p>Progress: ${course.progress}%</p>
         <progress value="${course.progress}" max="100"></progress>
     `;
@@ -196,7 +199,7 @@ function sendMessage() {
     const content = messageInput.value.trim();
     if (content) {
         const newMessage = {
-            sender: 'You',
+            sender: 'Anik',
             content: content,
             timestamp: new Date().toLocaleString()
         };
@@ -209,17 +212,24 @@ function sendMessage() {
         messageList.appendChild(messageDiv);
         messageInput.value = '';
         messageList.scrollTop = messageList.scrollHeight;
+        showNotification('Message sent successfully!');
     }
 }
 
 // Show modal
 function showModal() {
     modal.style.display = 'block';
+    setTimeout(() => {
+        modal.classList.add('show');
+    }, 10);
 }
 
 // Hide modal
 function hideModal() {
-    modal.style.display = 'none';
+    modal.classList.remove('show');
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
 }
 
 // Show section
@@ -233,17 +243,41 @@ function showSection(sectionId) {
         link.classList.remove('active');
     });
     document.querySelector(`nav a[data-section="${sectionId}"]`).classList.add('active');
+
+    // Animate new section
+    gsap.from(`#${sectionId} > *`, {
+        duration: 0.5,
+        opacity: 0,
+        y: 20,
+        stagger: 0.1
+    });
 }
 
 // Show notification
 function showNotification(message) {
-    const notification = document.getElementById('notification');
     notification.textContent = message;
-    notification.classList.remove('hidden');
+    notification.classList.add('show');
     setTimeout(() => {
-        notification.classList.add('hidden');
+        notification.classList.remove('show');
     }, 3000);
 }
 
 // Initialize the application
 init();
+
+// Add some GSAP animations
+gsap.from(".dashboard-card", {
+    duration: 0.5,
+    opacity: 0,
+    y: 50,
+    stagger: 0.1,
+    ease: "power2.out"
+});
+
+gsap.from(".course-card", {
+    duration: 0.5,
+    opacity: 0,
+    scale: 0.9,
+    stagger: 0.1,
+    ease: "back.out(1.7)"
+});
