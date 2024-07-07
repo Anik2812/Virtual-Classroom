@@ -1,34 +1,3 @@
-// Mock data (replace with actual API calls in a real application)
-const mockData = {
-    courses: [
-        { id: 1, name: "Advanced Mathematics", description: "Complex calculus and linear algebra", progress: 60, instructor: "Dr. Harsh Patel" },
-        { id: 2, name: "Quantum Physics", description: "Principles of quantum mechanics", progress: 40, instructor: "Prof. Jaimin Shah" },
-        { id: 3, name: "Data Structures", description: "Advanced algorithms and data structures", progress: 75, instructor: "Dr. Swayam Desai" },
-    ],
-    upcomingClasses: [
-        { course: "Advanced Mathematics", date: "2024-07-10", time: "10:00 AM" },
-        { course: "Quantum Physics", date: "2024-07-11", time: "2:00 PM" },
-        { course: "Data Structures", date: "2024-07-12", time: "11:00 AM" },
-    ],
-    announcements: [
-        { title: "New course material available for Advanced Mathematics", date: "2024-07-08" },
-        { title: "Quantum Physics exam rescheduled", date: "2024-07-09" },
-    ],
-    todoItems: [
-        { task: "Complete Math assignment on Complex Integration", dueDate: "2024-07-15" },
-        { task: "Prepare presentation for Quantum Entanglement", dueDate: "2024-07-14" },
-    ],
-    assignments: [
-        { id: 1, course: "Advanced Mathematics", title: "Complex Integration Problems", dueDate: "2024-07-20" },
-        { id: 2, course: "Quantum Physics", title: "Quantum Entanglement Essay", dueDate: "2024-07-22" },
-        { id: 3, course: "Data Structures", title: "Implement Red-Black Tree", dueDate: "2024-07-25" },
-    ],
-    messages: [
-        { sender: "Dr. Harsh Patel", content: "Don't forget about the upcoming calculus quiz!", timestamp: "2024-07-08 09:30 AM" },
-        { sender: "Jaimin", content: "Can we discuss the quantum mechanics project?", timestamp: "2024-07-08 02:15 PM" },
-    ],
-};
-
 // DOM elements
 const courseList = document.getElementById('course-list');
 const upcomingList = document.getElementById('upcoming-list');
@@ -46,17 +15,41 @@ const modalBody = document.getElementById('modal-body');
 const closeModal = document.getElementsByClassName('close')[0];
 const notification = document.getElementById('notification');
 
+
 // Initialize the application
-function init() {
-    populateCourseList();
+async function init() {
+    const courses = await fetchCourses();
+    const assignments = await fetchAssignments();
+    
+    populateCourseList(courses);
+    populateCourseGrid(courses);
+    populateAssignments(assignments);
     populateUpcomingClasses();
     populateAnnouncements();
     populateTodoList();
     populateQuickStats();
-    populateCourseGrid();
-    populateAssignments();
     populateMessages();
     setupEventListeners();
+    loadProfile();
+}
+async function fetchCourses() {
+    try {
+        const response = await fetch('/api/courses');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching courses:', error);
+        return [];
+    }
+}
+
+async function fetchAssignments() {
+    try {
+        const response = await fetch('/api/assignments');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching assignments:', error);
+        return [];
+    }
 }
 
 // Populate course list in sidebar
@@ -161,6 +154,10 @@ function setupEventListeners() {
         }
     });
 
+    document.getElementById('profile-form').addEventListener('submit', updateProfile);
+    document.getElementById('add-course-form').addEventListener('submit', addCourse);
+    document.getElementById('add-assignment-form').addEventListener('submit', addAssignment);
+
     // Navigation
     document.querySelectorAll('nav a').forEach(link => {
         link.addEventListener('click', (e) => {
@@ -214,6 +211,94 @@ function sendMessage() {
         messageList.scrollTop = messageList.scrollHeight;
         showNotification('Message sent successfully!');
     }
+}
+
+function loadProfile() {
+    // Fetch profile data from the server
+    fetch('/api/profile')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('profile-name').value = data.name;
+            document.getElementById('profile-email').value = data.email;
+            document.getElementById('profile-role').value = data.role;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function updateProfile(event) {
+    event.preventDefault();
+    const profileData = {
+        name: document.getElementById('profile-name').value,
+        email: document.getElementById('profile-email').value,
+        role: document.getElementById('profile-role').value
+    };
+
+    fetch('/api/profile', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(profileData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        showNotification('Profile updated successfully!');
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        showNotification('Failed to update profile.');
+    });
+}
+
+function addCourse(event) {
+    event.preventDefault();
+    const courseData = {
+        name: document.getElementById('course-name').value,
+        description: document.getElementById('course-description').value
+    };
+
+    fetch('/api/courses', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(courseData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        showNotification('Course added successfully!');
+        populateCourseList(); // Refresh the course list
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        showNotification('Failed to add course.');
+    });
+}
+
+function addAssignment(event) {
+    event.preventDefault();
+    const assignmentData = {
+        title: document.getElementById('assignment-title').value,
+        course: document.getElementById('assignment-course').value,
+        dueDate: document.getElementById('assignment-due-date').value
+    };
+
+    fetch('/api/assignments', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(assignmentData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        showNotification('Assignment added successfully!');
+        populateAssignments(); // Refresh the assignment list
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        showNotification('Failed to add assignment.');
+    });
 }
 
 // Show modal
