@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Virtual Classroom Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Virtual Classroom Platform</h1>
+        <div id="user-info">
+            <img src="https://via.placeholder.com/40" alt="User Avatar" id="user-avatar">
+            <span id="user-name">John Doe</span>
+        </div>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#home" class="active"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#courses"><i class="fas fa-book"></i> Courses</a></li>
+            <li><a href="#schedule"><i class="fas fa-calendar"></i> Schedule</a></li>
+            <li><a href="#messages"><i class="fas fa-envelope"></i> Messages</a></li>
+            <li><a href="#profile"><i class="fas fa-user"></i> Profile</a></li>
+        </ul>
+    </nav>
+    <div class="container">
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>My Courses</h3>
+                <ul id="course-list" class="course-list">
+                    <!-- Courses will be populated here -->
+                </ul>
+            </div>
+            <div class="content">
+                <div id="welcome" class="fade-in">
+                    <h2>Welcome to Your Virtual Classroom</h2>
+                    <p>Select a course from the sidebar to get started.</p>
+                    <div id="upcoming-classes">
+                        <h3>Upcoming Classes</h3>
+                        <ul id="upcoming-list">
+                            <!-- Upcoming classes will be populated here -->
+                        </ul>
+                    </div>
+                </div>
+                <div id="course-content" class="course-content hidden">
+                    <!-- Course content will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="notification" class="notification hidden">
+        <!-- Notifications will appear here -->
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
