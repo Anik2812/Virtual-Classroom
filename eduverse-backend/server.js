@@ -23,6 +23,7 @@ app.use(cors({
 
 app.use((req, res, next) => {
     res.setHeader("Content-Security-Policy", "default-src 'self'; script-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' https://cdnjs.cloudflare.com; img-src 'self' data:; connect-src 'self' http://localhost:5000;"); 
+    res.setHeader('Content-Type', 'application/json');
     next();
 });
 
@@ -100,6 +101,15 @@ app.post('/api/register', async (req, res) => {
     const user = new User({ username, password: hashedPassword, role });
     await user.save();
     res.status(201).send('User registered');
+});
+
+app.get('/api/profile', (req, res) => {
+    // Example response with JSON content
+    res.json({
+        username: 'Anik28',
+        name: 'Anik',
+        role: 'student'
+    });
 });
 
 app.get('/api/courses', authenticateToken, async (req, res) => {
